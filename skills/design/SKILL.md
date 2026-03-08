@@ -73,16 +73,45 @@ Wait for user confirmation.
 
 ### 4. Final Confirmation
 
-After all sections are confirmed, present a **brief summary** (≤ 5 bullet points)
-combining the key points into one view:
+After all sections are confirmed, present a structured summary for the user to review
+the full picture before writing the document.
+
+**Simple designs** (few decisions, small scope) — flat bullet list:
 
 > **设计要点确认：**
 > - 方案：...
 > - 关键决策：...
-> - 主要改动范围：...
-> - 已知风险：...
+> - 改动范围：...
+> - 风险：...
 >
 > 确认无误？我来写入设计文档。
+
+**Complex designs** (many decisions, large scope) — group by section with key points:
+
+> **设计要点确认：**
+>
+> **方案**
+> - ...
+>
+> **决策**（共 N 项）
+> - 决策 1：...
+> - 决策 2：...
+> - ...
+>
+> **影响范围**
+> - 模块 A：...
+> - 模块 B：...
+>
+> **风险**
+> - ...
+>
+> 确认无误？我来写入设计文档。
+
+Rules:
+- Keep each bullet to one line — this is a checklist, not a re-presentation
+- No new information — only summarize what was already discussed and confirmed
+- If the summary exceeds ~20 items, group related decisions and note the count
+  (e.g., "接口定义（5 项，详见上方讨论）")
 
 This catches contradictions or gaps that weren't visible in the chunked view.
 Only proceed to write the document after this final approval.
