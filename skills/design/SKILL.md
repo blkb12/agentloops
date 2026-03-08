@@ -69,11 +69,27 @@ Wait for user confirmation.
 **D. Risks** (~100 words)
 > 什么可能出问题，有什么不确定的。
 
-Wait for final approval to proceed.
+Wait for user confirmation.
 
-### 4. Write Design Document
+### 4. Final Confirmation
 
-After approval, write `.designs/<topic>.md`:
+After all sections are confirmed, present a **brief summary** (≤ 5 bullet points)
+combining the key points into one view:
+
+> **设计要点确认：**
+> - 方案：...
+> - 关键决策：...
+> - 主要改动范围：...
+> - 已知风险：...
+>
+> 确认无误？我来写入设计文档。
+
+This catches contradictions or gaps that weren't visible in the chunked view.
+Only proceed to write the document after this final approval.
+
+### 5. Write Design Document
+
+After final approval, write `.designs/<topic>.md`:
 
 ```markdown
 # <Topic>
@@ -101,7 +117,7 @@ What could go wrong, what's uncertain.
 
 Keep it concise. The document is a working reference, not a specification.
 
-### 5. Update INDEX
+### 6. Update INDEX
 
 Update `.designs/INDEX.md`:
 - Change status from `Clarified` to `Designed`
@@ -111,7 +127,7 @@ Update `.designs/INDEX.md`:
 - <topic> | Designed | YYYY-MM-DD | [intent](<topic>.intent.md) | [design](<topic>.md)
 ```
 
-### 6. Handoff
+### 7. Handoff
 
 Tell the user:
 
