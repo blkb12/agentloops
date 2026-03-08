@@ -3,7 +3,7 @@ name: agentloops-design
 description: |
   Technical design before implementation. Use after intent has been clarified to make technical
   decisions. Reads the codebase deeply, decides on approach, interfaces, and patterns, then
-  presents the design for user approval. Requires a Task with clarified intent — if none exists,
+  presents the design for user approval. Requires a clarified intent — if none exists,
   invoke agentloops-clarify first. Use for any task involving design decisions before writing code.
 ---
 
@@ -11,20 +11,23 @@ description: |
 
 ## Precondition
 
-A Task with clarified intent must exist. If not → **stop, invoke /agentloops-clarify first**.
+A `.designs/<topic>.intent.md` must exist (produced by clarify phase).
+If not → **stop, invoke /agentloops-clarify first**.
 
 No code changes. Read code to inform decisions. Present design for approval before implementation.
 
+## Startup Protocol
+
+1. Read `.designs/INDEX.md` — find entry with status `Clarified`
+2. Read `.designs/<topic>.intent.md` — recover intent, decisions, scope
+3. Scan relevant code paths based on intent
+
+Do NOT start designing until you've completed these reads.
+The intent file is your source of truth — not conversation history.
+
 ## Process
 
-### 1. Read INDEX
-
-Read `.designs/INDEX.md` (if it exists) to understand current design landscape:
-- Active designs that may relate to this task
-- Completed designs with relevant context
-- Avoid duplicating or conflicting with existing designs
-
-### 2. Deep-Read the Codebase
+### 1. Deep-Read the Codebase
 
 Go beyond the surface scan done during clarification:
 - Trace full code paths affected by this change
@@ -32,7 +35,7 @@ Go beyond the surface scan done during clarification:
 - Identify existing patterns, conventions, and abstractions
 - Find potential conflicts or side effects
 
-### 3. Make Technical Decisions
+### 2. Make Technical Decisions
 
 Based on what you've read:
 - Choose approach and justify why
@@ -40,17 +43,35 @@ Based on what you've read:
 - Decide: follow existing patterns or diverge (and why)
 - Identify risks and unknowns
 
-### 4. Present Design for Approval
+### 3. Present Design — Chunked, Not Dumped
 
-Summarize:
-- **Approach** — how, and why this over alternatives
-- **Key technical decisions** — with rationale
-- **Impact** — what existing code is affected
-- **Risks** — what could go wrong, what's uncertain
+Present the design in **3-4 short sections**, each ≤ 300 words. After each section,
+pause for the user to confirm, question, or adjust.
 
-Get explicit approval before proceeding.
+**Section order:**
 
-### 5. Write Design Document
+**A. Approach Summary** (~100 words)
+> 一句话方案 + 为什么选这个而非其他方案。
+
+Wait for user confirmation before continuing.
+
+**B. Key Decisions** (~200 words)
+> 关键技术决策列表，每条一行描述 + 一行理由。
+
+Mark anything uncertain with `[NEEDS CLARIFICATION: specific question]`.
+Wait for user confirmation.
+
+**C. Impact & Changes** (~200 words)
+> 哪些现有代码会被影响，改动范围多大。
+
+Wait for user confirmation.
+
+**D. Risks** (~100 words)
+> 什么可能出问题，有什么不确定的。
+
+Wait for final approval to proceed.
+
+### 4. Write Design Document
 
 After approval, write `.designs/<topic>.md`:
 
@@ -58,6 +79,7 @@ After approval, write `.designs/<topic>.md`:
 # <Topic>
 
 > One-line summary of what and why.
+> Intent: [<topic>.intent.md](<topic>.intent.md)
 
 ## Approach
 
@@ -79,50 +101,42 @@ What could go wrong, what's uncertain.
 
 Keep it concise. The document is a working reference, not a specification.
 
-### 6. Update INDEX
+### 5. Update INDEX
 
-Update `.designs/INDEX.md` (create if not exists):
+Update `.designs/INDEX.md`:
+- Change status from `Clarified` to `Designed`
+- Add link to design doc:
 
 ```markdown
-# Designs
-
-## Active
-- [topic](topic.md) — one-line summary
-
-## Completed
-
-## Dropped
+- <topic> | Designed | YYYY-MM-DD | [intent](<topic>.intent.md) | [design](<topic>.md)
 ```
 
-Rules:
-- New design → add to Active
-- Redesign of existing topic → move old entry to Dropped (with reason), add new to Active
-- Same topic name overwrites the design file; INDEX tracks the transition
+### 6. Handoff
 
-### 7. Update Task
+Tell the user:
 
-Add design decisions to the Task:
-- Approach chosen
-- Key technical decisions
-- Any scope adjustments discovered during design
-
-→ **Next: invoke /agentloops-planning**
+> 设计已记录到 `.designs/<topic>.md`。
+> 建议 **开新会话** 运行 `/agentloops-planning` 进入规划阶段。
+> 也可以在当前会话继续。
 
 ## Lifecycle (for other skills/sessions to follow)
 
 | Event | Action |
 |-------|--------|
-| Design created | Add to Active in INDEX |
+| Design created | Status → Designed in INDEX |
 | Design adjusted during execution | Update the .md file directly, INDEX stays |
-| Implementation completed | Move to Completed in INDEX (add date) |
-| New design replaces old | Old → Dropped (with reason), new → Active |
-| Design abandoned | Move to Dropped in INDEX |
+| Implementation completed | Status → Completed in INDEX (add date) |
+| New design replaces old | Old → Dropped (with reason), new entry added |
+| Design abandoned | Status → Dropped in INDEX |
 
 ## Skip Conditions
 
 - Task is purely mechanical (clarify already determined no design decisions)
 - The approach is obvious and singular (no alternatives to weigh)
+- In these cases, create a minimal design doc and proceed
 
 ## When the Design Doesn't Fit
 
-If during design you discover the clarified intent needs revision (e.g., assumed approach isn't feasible) → **stop, invoke /agentloops-clarify**. Don't force a bad design to fit a flawed intent.
+If during design you discover the clarified intent needs revision → **stop, update
+`.designs/<topic>.intent.md` with what changed and why, invoke /agentloops-clarify**.
+Don't force a bad design to fit a flawed intent.

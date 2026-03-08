@@ -11,20 +11,24 @@ description: |
 
 ## Precondition
 
-An approved design document must exist at `.designs/<topic>.md` with Active status in INDEX.
+A `.designs/<topic>.md` must exist with status `Designed` in INDEX.
 If not → **stop, invoke /agentloops-design first**.
 
 No code changes. Read code and the design doc to inform decomposition.
 
+## Startup Protocol
+
+1. Read `.designs/INDEX.md` — find entry with status `Designed`
+2. Read `.designs/<topic>.intent.md` — recover original intent and scope
+3. Read `.designs/<topic>.md` — understand approach, decisions, impact
+4. Read affected code paths to understand current state
+
+Do NOT start planning until you've completed these reads.
+The intent + design files are your source of truth — not conversation history.
+
 ## Process
 
-### 1. Read Context
-
-- Read `.designs/INDEX.md` to locate the active design
-- Read `.designs/<topic>.md` for approach, decisions, impact
-- Read affected code paths to understand current state
-
-### 2. Decompose into Steps
+### 1. Decompose into Steps
 
 Break the design into ordered steps. Each step must be:
 
@@ -39,14 +43,15 @@ Ordering principles:
 - Tests alongside or immediately after the code they test
 - Each step builds on the last — no step requires jumping back
 
-### 3. Write Plan File
+### 2. Write Plan File
 
 Write `.designs/<topic>.plan.md`:
 
 ```markdown
 # <Topic> Plan
 
-> Design: [<topic>](<topic>.md)
+> Intent: [<topic>.intent.md](<topic>.intent.md)
+> Design: [<topic>.md](<topic>.md)
 > Status: 0/N steps done
 
 ## Steps
@@ -64,9 +69,9 @@ Rules:
 - **No code in the plan** — the executor is a capable Claude session
 - **Every step has Files and Verify** — no exceptions
 - **Status line** at the top — `0/N steps done`, updated by execute skill
-- **Link to design doc** — executor reads it for rationale and context
+- **Link to both intent and design** — executor reads them for full context
 
-### 4. Present for Approval
+### 3. Present for Approval
 
 Show the plan to the user. They may:
 - Reorder steps
@@ -74,19 +79,31 @@ Show the plan to the user. They may:
 - Adjust scope
 - Approve as-is
 
-### 5. Update INDEX
+### 4. Update INDEX
 
-If not already tracked, ensure `.designs/INDEX.md` reflects the active design has a plan.
+Update `.designs/INDEX.md`:
+- Change status from `Designed` to `Planned`
+- Add link to plan:
+
+```markdown
+- <topic> | Planned | YYYY-MM-DD | [intent](<topic>.intent.md) | [design](<topic>.md) | [plan](<topic>.plan.md)
+```
+
+## Handoff
+
+Tell the user:
+
+> 计划已记录到 `.designs/<topic>.plan.md`。
+> 建议 **开新会话** 运行 `/agentloops-execute` 开始执行。
+> 执行阶段会自动从 intent → design → plan 文件链恢复完整上下文。
 
 ## Skip Conditions
 
 - Design is trivial (single-step, obvious implementation)
 - User says to execute directly from design
 
-## When Done
-
-Plan is approved → **Next: user starts a new session and invokes /agentloops-execute**.
-
 ## When the Plan Doesn't Fit
 
-If decomposition reveals the design is incomplete or flawed (e.g., missing a step that requires an unaddressed decision) → **stop, invoke /agentloops-design**. Don't paper over gaps with vague plan steps.
+If decomposition reveals the design is incomplete or flawed (e.g., missing a step that
+requires an unaddressed decision) → **stop, note what's wrong, invoke /agentloops-design**.
+Don't paper over gaps with vague plan steps.

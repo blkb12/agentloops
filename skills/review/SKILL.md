@@ -11,18 +11,25 @@ description: |
 
 ## Precondition
 
-All steps in `.designs/<topic>.plan.md` must be marked `- [x]` done.
+All steps in `.designs/<topic>.plan.md` must be marked `- [x]` done,
+with status `Executing` in INDEX.
 If uncompleted steps remain → **stop, invoke /agentloops-execute first**.
+
+## Startup Protocol
+
+Read the full file chain for fresh perspective:
+
+1. Read `.designs/INDEX.md` — find entry with status `Executing`
+2. Read `.designs/<topic>.intent.md` — recover original intent and scope
+3. Read `.designs/<topic>.md` — the design approach and decisions
+4. Read `.designs/<topic>.plan.md` — what was planned and executed
+
+The file chain is your source of truth. Review with fresh eyes — not biased by
+implementation context.
 
 ## Process
 
-### 1. Load Context
-
-- Read `.designs/INDEX.md` — find the design under review
-- Read `.designs/<topic>.md` — the design intent and decisions
-- Read `.designs/<topic>.plan.md` — what was planned and executed
-
-### 2. Verify Holistically
+### 1. Verify Holistically
 
 Run full validation, not just individual step verifies:
 
@@ -33,37 +40,45 @@ Run full validation, not just individual step verifies:
 
 Fix auto-fixable issues (lint, formatting) directly — up to 3 attempts.
 
-### 3. Check Design Intent
+### 2. Check Design Intent
 
-For each design decision in `.designs/<topic>.md`:
+For each decision in `.designs/<topic>.md`:
 - Is it reflected in the implementation?
 - Any decision that was silently dropped or changed?
 - Any unintended side effects?
 
+For each scope item in `.designs/<topic>.intent.md`:
+- Is everything in "In" scope actually implemented?
+- Was anything out of "Out" scope accidentally included?
+
 This is the critical check that automated tests can't do.
 
-### 4. Verdict
+### 3. Verdict
 
 **Accept:**
 - All tests pass
 - Design intent is met
 - No significant issues found
-- → Move design to Completed in INDEX.md (add date)
+- → Update INDEX status to `Completed` (add date)
 - → Done
 
 **Remediate (minor — implementation issues):**
 - Issues found that can be fixed with additional steps
 - → Append fix steps to `.designs/<topic>.plan.md` (continue numbering)
 - → Update Status line to reflect new total
-- → **Next: invoke /agentloops-execute**
+- → Tell the user:
+  > 发现 N 个需要修复的问题，已追加到计划。
+  > 建议 **开新会话** 运行 `/agentloops-execute` 继续修复。
 - → Do NOT move to Completed
 
 **Redesign (major — design-level flaw):**
 - The approach itself is wrong, or a key decision was misguided
-- → Move design to Dropped in INDEX.md (with reason)
-- → **Next: invoke /agentloops-design** (or /agentloops-clarify if the intent itself was wrong)
+- → Update INDEX status to `Dropped` (with reason)
+- → Tell the user:
+  > 发现设计层面的问题：<问题描述>。
+  > 建议 **开新会话** 运行 `/agentloops-design`（或 `/agentloops-clarify`）重新设计。
 
-### 5. Report
+### 4. Report
 
 Summarize briefly:
 - What was checked

@@ -11,20 +11,31 @@ description: |
 
 ## Precondition
 
-A plan file must exist at `.designs/<topic>.plan.md` with uncompleted `- [ ]` steps.
+A `.designs/<topic>.plan.md` must exist with status `Planned` or `Executing` in INDEX,
+and have uncompleted `- [ ]` steps.
 If no plan exists → **stop, invoke /agentloops-planning first**.
 If all steps are already done → **stop, invoke /agentloops-review instead**.
 
 ## Startup Protocol
 
-Every execution session begins the same way:
+Every execution session begins the same way — **read the full file chain**:
 
-1. Read `.designs/INDEX.md` — find active designs
-2. Read `.designs/<topic>.plan.md` — find next `- [ ]` step
-3. Read `.designs/<topic>.md` — understand design context
-4. Scan recently changed files (git log) — understand what previous sessions did
+1. Read `.designs/INDEX.md` — find active entry
+2. Read `.designs/<topic>.intent.md` — recover original intent and scope
+3. Read `.designs/<topic>.md` — understand design approach and decisions
+4. Read `.designs/<topic>.plan.md` — find next `- [ ]` step
+5. Scan recently changed files (git log) — understand what previous sessions did
 
 Do NOT start coding until you've completed these reads.
+The file chain is your source of truth — not conversation history, not assumptions.
+
+## On First Step
+
+Update INDEX status from `Planned` to `Executing`:
+
+```markdown
+- <topic> | Executing | YYYY-MM-DD | [intent](<topic>.intent.md) | [design](<topic>.md) | [plan](<topic>.plan.md)
+```
 
 ## Execution Loop
 
@@ -59,7 +70,7 @@ Run the step's Verify command. It must pass.
 - **Next step exists and is independent** → continue
 - **Blocked** → stop, report blocker
 - **Session getting long** → stop at a clean boundary, progress is saved in the plan file
-- **All steps done** → **Next: invoke /agentloops-review** (do NOT update INDEX — that's review's job)
+- **All steps done** → **see Handoff below**
 
 ## Commit Discipline
 
@@ -75,10 +86,18 @@ Include both code changes and the updated `.plan.md` in the same commit.
 
 | Situation | Action |
 |-----------|--------|
-| Step is unclear | Read the design doc for context, then proceed with best judgment |
+| Step is unclear | Read the intent + design docs for context, then proceed with best judgment |
 | Step seems wrong | Add a note, skip it, continue with next step |
 | Design flaw discovered | Stop execution, note the issue in the plan → **invoke /agentloops-design** |
 | Verify command itself is wrong | Fix the verify command in the plan, then run the corrected version |
+
+## Handoff
+
+When all steps are done:
+
+> 所有步骤已完成。
+> 建议 **开新会话** 运行 `/agentloops-review` 进行验收审查。
+> 新会话会从 intent → design → plan 文件链恢复完整上下文，以全新视角审查。
 
 ## Do NOT
 
