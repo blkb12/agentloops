@@ -35,15 +35,48 @@ Go beyond the surface scan done during clarification:
 - Identify existing patterns, conventions, and abstractions
 - Find potential conflicts or side effects
 
-### 2. Make Technical Decisions
+### 2. Align Core Concepts
 
-Based on what you've read:
+Before technical decisions, align with the user on what the core "things" are.
+
+**Present**: list the concepts you identified from intent + code, one sentence each:
+
+> 基于意图和代码，我理解这个系统的核心概念是：
+> - **Concept A**：一句话——它是什么，为什么存在
+> - **Concept B**：一句话
+> - **Concept C**：一句话
+>
+> 这跟你的理解一致么？有没有觉得不对、多余、或者缺少的？
+
+**React to the user's response**:
+
+- User confirms → proceed
+- User adjusts a concept → update your understanding, re-present if needed
+- User is unsure about a concept → help them clarify by grounding it in a concrete scenario:
+  "比如用户做 X 的时候，这个概念负责的是 Y——是这样理解么？"
+- User is unsure overall → try a different angle: describe the system as a short story
+  ("用户来了，先做 A，然后 B 发生..."), let the concepts emerge from the narrative
+- Concepts feel tangled or contradictory → dig deeper on the problematic one: what's its
+  boundary? what does it NOT include? what rules must always hold?
+
+The 6 diagnostic questions (purpose, boundaries, relationships, invariants, lifecycle,
+naming precision) are your internal tools — use them to prepare your presentation and to
+probe when the user is uncertain. Don't expose them as a checklist.
+
+Reference `knowledge/conceptual-modeling-guide.md` for deeper techniques when concepts
+prove difficult to untangle.
+
+The goal: shared vocabulary for the concepts this design is built on.
+
+### 3. Make Technical Decisions
+
+Based on the aligned concepts:
 - Choose approach and justify why
 - Define interfaces, data structures, module boundaries
 - Decide: follow existing patterns or diverge (and why)
 - Identify risks and unknowns
 
-### 3. Present Design — Chunked, Not Dumped
+### 4. Present Design — Chunked, Not Dumped
 
 Present the design in **3-4 short sections**, each ≤ 300 words. After each section,
 pause for the user to confirm, question, or adjust.
@@ -71,7 +104,7 @@ Wait for user confirmation.
 
 Wait for user confirmation.
 
-### 4. Final Confirmation
+### 5. Final Confirmation
 
 After all sections are confirmed, present a structured summary for the user to review
 the full picture before writing the document.
@@ -116,7 +149,7 @@ Rules:
 This catches contradictions or gaps that weren't visible in the chunked view.
 Only proceed to write the document after this final approval.
 
-### 5. Write Design Document
+### 6. Write Design Document
 
 After final approval, write `.designs/<topic>.md`:
 
@@ -146,7 +179,7 @@ What could go wrong, what's uncertain.
 
 Keep it concise. The document is a working reference, not a specification.
 
-### 6. Update INDEX
+### 7. Update INDEX
 
 Update `.designs/INDEX.md`:
 - Change status from `Clarified` to `Designed`
@@ -156,7 +189,7 @@ Update `.designs/INDEX.md`:
 - <topic> | Designed | YYYY-MM-DD | [intent](<topic>.intent.md) | [design](<topic>.md)
 ```
 
-### 7. Handoff
+### 8. Handoff
 
 Tell the user:
 
